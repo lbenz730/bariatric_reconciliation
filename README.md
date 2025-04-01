@@ -4,9 +4,6 @@ Code for the paper:
 
 Haneuse, S., Benz, L., Smith, V., Arterburn, D., and Macejewski, M.L. "Long-term cardiovascular outcomes following bariatric surgery: Reconciling seemingly conflicting evidence." 
 
-
-Repository to study the effect of bariatric surgery on the long term risk of cardiovascular disease (CVD) among a Type II diabetic population.
-
 ## R Scripts (`scripts/`)
 
 __helpers.R__: Useful helper functions
