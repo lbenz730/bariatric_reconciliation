@@ -1,1 +1,0 @@
-scp -r * lbenz@fasselogin.rc.fas.harvard.edu:~/bariatric_tte/

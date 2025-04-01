@@ -1,5 +1,0 @@
-logs/*
-logs
-/data/
-/models/
-Rplots.pdf
