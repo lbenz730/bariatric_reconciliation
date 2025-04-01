@@ -25,6 +25,7 @@ __helpers.R__: Useful helper functions
 * __spline_BIC.R__: Analysis of BIC for various IPW models using NCS on various continuous covariates (Propensity Model \#3)
 * __patient_flowchart.R__: Numbers for patient flow chart (eFigure 1)
 * __covariate_balance.R__: Use `cobalt` to make covariate balance plot (eFigure 2)
+* __bmi_a1c_change_eda.R__: Create Figure 2
 
 ## Jobs (`jobs/`)
 * __build_cvd_trials.sh__: Build target trials in sequence
