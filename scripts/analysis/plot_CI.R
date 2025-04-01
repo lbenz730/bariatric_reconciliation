@@ -12,9 +12,9 @@ df_ci <-
            fct_relevel(ipw_formula, c('Linear Main Effects', 
                                       'Madenci Proxy (NCS on Continuous Covariates, No Smoking or 1-Year A1c Change)',
                                       'Best BIC Model (Splines on BMI/Age, No A1c 1yr Change)'))) %>% 
-  mutate('elig_criteria' = case_when(elig_criteria == 'No Pre-Op Restrictions' ~ 'Eligibility Set #1',
-                                     elig_criteria == 'Pre-Op Restrictions' ~ 'Eligibility Sets #1 + #2',
-                                     T ~ 'Eligibility Sets #1 + #2 + #3')) %>% 
+  mutate('elig_criteria' = case_when(elig_criteria == 'No Pre-Op Restrictions' ~ 'Trial #1A',
+                                     elig_criteria == 'Pre-Op Restrictions' ~ 'Trial #1B',
+                                     T ~ 'Trial #1C')) %>% 
   mutate('ipw_formula' = case_when(ipw_formula == 'Linear Main Effects' ~ 'Propensity Score Model #1',
                                    ipw_formula == 'Madenci Proxy (NCS on Continuous Covariates, No Smoking or 1-Year A1c Change)' ~ 'Propensity Score Model #2',
                                    T ~ 'Propensity Score Model #3'))
@@ -27,9 +27,9 @@ df_bootstraps <-
                                      'Linear Main Effects', 
                                      'Madenci Proxy (NCS on Continuous Covariates, No Smoking or 1-Year A1c Change)',
                                      'Best BIC Model (Splines on BMI/Age, No A1c 1yr Change)')) %>% 
-  mutate('elig_criteria' = case_when(elig_criteria == 'No Pre-Op Restrictions' ~ 'Eligibility Set #1',
-                                     elig_criteria == 'Pre-Op Restrictions' ~ 'Eligibility Sets #1 + #2',
-                                     T ~ 'Eligibility Sets #1 + #2 + #3')) %>% 
+  mutate('elig_criteria' = case_when(elig_criteria == 'No Pre-Op Restrictions' ~ 'Trial #1A',
+                                     elig_criteria == 'Pre-Op Restrictions' ~ 'Trial #1B',
+                                     T ~ 'Trial #1C')) %>% 
   mutate('ipw_formula' = case_when(ipw_formula == 'Linear Main Effects' ~ 'Propensity Score Model #1',
                                    ipw_formula == 'Madenci Proxy (NCS on Continuous Covariates, No Smoking or 1-Year A1c Change)' ~ 'Propensity Score Model #2',
                                    T ~ 'Propensity Score Model #3'))

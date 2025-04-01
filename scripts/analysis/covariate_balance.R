@@ -153,9 +153,9 @@ write_csv(df_balance_all, 'data/results/covariate_balance.csv')
 df_balance_all <- read_csv('data/results/covariate_balance.csv')
 df_plot <- 
   df_balance_all %>% 
-  mutate('elig_criteria' = case_when(elig_criteria == 1 ~ 'Eligibility Set #1', 
-                                     elig_criteria == 2 ~ 'Eligibility Sets #1 + #2',
-                                     elig_criteria == 3 ~ 'Eligibility Sets #1 + #2 + #3'),
+  mutate('elig_criteria' = case_when(elig_criteria == 1 ~ 'Trial #1A', 
+                                     elig_criteria == 2 ~ 'Trial #1B',
+                                     elig_criteria == 3 ~ 'Trial #1C'),
          'covariate' = case_when(covariate == 'a1c_change_1yr' ~ '1-Year A1c Change',
                                  covariate == 'baseline_a1c' ~ 'Baseline A1c',
                                  covariate == 'baseline_age' ~ 'Baseline Age',

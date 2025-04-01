@@ -56,6 +56,37 @@ df_continuous <-
                                 variable == 'bmi_change_1yr' ~ '1 Year BMI Change',
                                 variable == 'a1c_change_1yr' ~ '1 Year A1c Change'))
 
+### Figure to Inform Effects of Continuous Covariates on Treatment %
+ggplot(df_continuous, aes(x = bucket, y = pct_surgery)) + 
+  facet_wrap(~variable, scales = 'free') +
+  geom_point(aes(fill = log(n_obs)), pch = 21, size = 3) + 
+  scale_y_continuous(labels = scales::percent) +
+  scale_fill_viridis_c(option = 'B', breaks = log(10^c(1:6)), labels = ~scales::number(exp(.x), big.mark = ',')) + 
+  theme(legend.position = 'right') + 
+  labs(title = 'Treatment Probability by Continuous Covariates', 
+       subtitle = 'Trial #1A',
+       x = 'Covariate Value',
+       y = '% of Person-Trials\nUndergoing Bariatric Surgery',
+       fill = '# of Person-Trials')
+ggsave('figures/results/continuous_covariates.png', height = 9/1.2, width = 16/1.2)
+
+ggplot(df_continuous %>% filter(n_obs >= 10000), aes(x = bucket, y = pct_surgery)) + 
+  facet_wrap(~variable, scales = 'free') +
+  geom_point(aes(fill = log(n_obs)), pch = 21, size = 3) + 
+  scale_y_continuous(labels = scales::percent) +
+  scale_fill_viridis_c(option = 'B', breaks = log(c(10000, 25000, 50000, 
+                                                    100000, 250000, 500000,
+                                                    1000000)), 
+                       labels = ~scales::number(exp(.x), big.mark = ',')) + 
+  theme(legend.position = 'right') + 
+  labs(title = 'Treatment Probability by Continuous Covariates', 
+       subtitle = 'No Pre-Operative Restrictions\nBuckets w/ >= 10,000 Observations',
+       x = 'Covariate Value',
+       y = '% of Person-Trials\nUndergoing Bariatric Surgery',
+       fill = '# of Person-Trials')
+ggsave('figures/results/continuous_covariates_filtered.png', height = 9/1.2, width = 16/1.2)
+
+
 ### BIC analysis
 formulae <- 
   list('Linear Main Effects' = 
@@ -204,7 +235,7 @@ formulae <-
          
          ns(a1c_change_1yr, knots = c(-3)),
        
-       'NCS on Baseline BMI and Age (Best Single Knots)' = 
+       'NCS on Baseline BMI and Age, No A1c Change (Best Single Knots)' = 
          surgery ~ 
          ### Categorical
          race_black + gender + smoking_status + 
