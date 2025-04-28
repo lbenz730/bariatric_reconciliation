@@ -38,6 +38,7 @@ weights <- read_parquet(glue('{data_dir}/all_weights_further_cleaned.parquet')) 
 cvd_outcomes <- read_parquet(glue('{data_dir}/bariatric_tte/cvd_outcomes.parquet'))
 obesity_comorbidities <- read_parquet(glue('{data_dir}/bariatric_tte/obesity_comorbidities.parquet'))
 exclusions <- read_parquet(glue('{data_dir}/bariatric_tte/exclusion_criteria.parquet'))
+exclusions_cancer <- read_parquet(glue('{data_dir}/bariatric_tte/exclusion_cancer.parquet'))
 pregnancy <- read_parquet(glue('{data_dir}/microvascular_tte/pregnancy.parquet'))
 death <- read_parquet(glue('{data_dir}/microvascular_tte/death.parquet'))
 df_surgery <- read_parquet(glue('{data_dir}/bs_types_reviewed.parquet')) ### bs types
@@ -149,6 +150,11 @@ build_cvd_trial_1 <- function(trial_id, study_start, study_end) {
     filter(adate < trial_start) %>% 
     rename('exclude_date' = adate)
   
+  df_exclude_cancer <- 
+    exclusions_cancer %>% 
+    filter(adate < trial_start) %>% 
+    rename('cancer_date' = adate)
+  
   ### Pre-Process Pregnancy
   df_pregnancy <- 
     pregnancy %>% 
@@ -212,7 +218,9 @@ build_cvd_trial_1 <- function(trial_id, study_start, study_end) {
     
     ### (11) Exclusions 
     left_join(df_exclude, by = 'subject_id') %>% 
+    left_join(df_exclude_cancer, by = 'subject_id') %>% 
     mutate('elig_exclusions' = is.na(exclude_date)) %>% 
+    mutate('elig_cancer' = is.na(cancer_date)) %>% 
     
     ### (12) Pregnant in Last 12 Months
     left_join(df_pregnancy, by = 'subject_id')  %>% 

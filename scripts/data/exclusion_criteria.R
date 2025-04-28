@@ -74,8 +74,18 @@ exclude_cancer <-
     T ~ 'Cancer')) %>% 
   select(subject_id, adate, dx, exclusion)
 
+
+df_exclude_cancer <- 
+  exclude_cancer %>% 
+  arrange(adate) %>% 
+  group_by(subject_id) %>% 
+  slice(1) %>% 
+  ungroup()
+
+write_parquet(df_exclude_cancer, glue('{data_dir}/bariatric_tte/exclusion_cancer.parquet'))
+
 df_exclude <- 
-  bind_rows(exclude_cancer, exclude_hospital, exclude_mh) %>% 
+  bind_rows(exclude_hospital, exclude_mh) %>% 
   arrange(adate) %>% 
   group_by(subject_id) %>% 
   slice(1) %>% 

@@ -28,7 +28,7 @@ df1_naive <-
   df_trials %>% 
   mutate('elig_a1c_missing' = !is.na(baseline_a1c)) %>% 
   filter(trial_id %in% trial_range) %>% 
-  filter(elig_age, elig_a1c_missing, elig_diabetes, elig_surgery, elig_bmi_missing, elig_bmi_range, elig_cvd) %>% 
+  filter(elig_age, elig_a1c_missing, elig_diabetes, elig_surgery, elig_bmi_missing, elig_bmi_range, elig_cvd, elig_cancer, elig_pregnancy) %>% 
   mutate('elig' = 'No Pre-Op Restrictions')
 
 ### Pre-Operative Eligibility Criteria
@@ -36,7 +36,7 @@ df1_preop <-
   df_trials %>% 
   mutate('elig_a1c_missing' = !is.na(baseline_a1c)) %>% 
   filter(trial_id %in% trial_range) %>% 
-  filter(elig_age, elig_a1c_missing, elig_diabetes, elig_surgery, elig_bmi_missing, elig_bmi_range, elig_cvd) %>%
+  filter(elig_age, elig_a1c_missing, elig_diabetes, elig_surgery, elig_bmi_missing, elig_bmi_range, elig_cvd, elig_cancer, elig_pregnancy) %>%
   filter(elig_smoking, elig_bmi_change) %>% 
   mutate('elig' = 'Pre-Op Restriction Proxy')
 
@@ -45,9 +45,9 @@ df1_extra <-
   df_trials %>% 
   mutate('elig_a1c_missing' = !is.na(baseline_a1c)) %>% 
   filter(trial_id %in% trial_range) %>% 
-  filter(elig_age, elig_a1c_missing, elig_diabetes, elig_surgery, elig_bmi_missing, elig_bmi_range, elig_cvd) %>%
+  filter(elig_age, elig_a1c_missing, elig_diabetes, elig_surgery, elig_bmi_missing, elig_bmi_range, elig_cvd, elig_cancer, elig_pregnancy) %>%
   filter(elig_smoking, elig_bmi_change) %>% 
-  filter(elig_exclusions, elig_pregnancy) %>% 
+  filter(elig_exclusions) %>% 
   mutate('elig' = 'Pre-Op Restriction Proxy + Additional Exclusion Criteria')
 
 df1 <-
@@ -123,6 +123,7 @@ df_summary <-
                                      elig_criteria == 'elig_a1c_missing' ~ 'Available A1c w/in 1 Year',
                                      elig_criteria == 'elig_pregnancy' ~ 'No Pregnancy w/in 1 Year',
                                      elig_criteria == 'elig_exclusions' ~ 'No Exclusions',
+                                     elig_criteria == 'elig_cancer' ~ 'No History of Cancer',
                                      elig_criteria == 'elig_bmi_range' ~ 'Basline BMI <= 60 kg/m^2, Max BMI in Last Year >= 35 kg/m^2 (Among those w/ available BMI)')) %>% 
   mutate('surgery' = paste0(ifelse(surgery == 1, 'Surgery', 'No Surgery'), ' (# of Possible Subject Trials = ', prettyNum(n, big.mark = ','), ')')) %>% 
   select(-n)
@@ -170,8 +171,9 @@ df_surg <-
 df_exclude <- 
   df_surg %>% 
   left_join(df_exclusions_raw, by = 'subject_id', relationship = "many-to-many") %>% 
-  filter((adate < trial_start & exclusion != 'Pregnancy') | 
-           (adate < trial_start & adate >= trial_start %m-% years(1) & exclusion == 'Pregnancy')) %>% 
+  filter(exclusion != 'Cancer', exclusion != 'Pregnancy') %>% 
+  filter((adate < trial_start & exclusion != 'Pregnancy') |
+           (adate < trial_start & adate >= trial_start %m-% years(1) & exclusion == 'Pregnancy')) %>%
   distinct(subject_id, trial_id, exclusion)
 
 exclude_summary <- 
@@ -191,7 +193,7 @@ gt_exclude <-
              'n' = '# of Patients',
              'pct' = '%') %>% 
   tab_header(title = md('**Table of Exclusions for Patients Undergoing Bariatric Surgery**'),
-             subtitle = md('**Among 4,969 Patients Meeting All Other Eligibility Criteria<br>(Including Pre-Operative Restrictions)**'))
+             subtitle = md('**Among 4,706 Patients Meeting All Other Eligibility Criteria<br>(Including Pre-Operative Restrictions)**'))
 cluster_gtsave(gt_exclude, 'figures/tables/exclusion_summary_table.png', vheight = 100, vwidth = 700)
 
 
@@ -204,8 +206,9 @@ df_surg_all <-
 df_exclude_all <- 
   df_surg_all %>% 
   left_join(df_exclusions_raw, by = 'subject_id') %>% 
-  filter((adate < index_date & exclusion != 'Pregnancy') | 
-           (adate < index_date & adate >= index_date %m-% years(1) & exclusion == 'Pregnancy')) %>% 
+  filter(exclusion != 'Cancer', exclusion != 'Pregnancy') %>% 
+  filter((adate < index_date & exclusion != 'Pregnancy') |
+           (adate < index_date & adate >= index_date %m-% years(1) & exclusion == 'Pregnancy')) %>%
   distinct(subject_id, exclusion)
 
 exclude_summary_all <- 
@@ -227,3 +230,63 @@ gt_exclude_all <-
   tab_header(title = md('**Table of Exclusions for Patients Undergoing Bariatric Surgery**'),
              subtitle = md('**Among 45,956 Patients in DURABLE Database**'))
 cluster_gtsave(gt_exclude_all, 'figures/tables/exclusion_summary_table_DURABLE.png', vheight = 100, vwidth = 700)
+
+
+### Population Summary for DURABLE
+# durable_trials <- map_dfr(1:84, ~read_parquet(glue('{data_dir}/bariatric_tte/trial_{.x}_DURABLE.parquet')))
+# write_parquet(durable_trials, glue('{data_dir}/bariatric_tte/DURABLE_trials_combined.parquet'))
+# durable_trials <- 
+#   read_parquet(glue('{data_dir}/bariatric_tte/DURABLE_trials_combined.parquet')) %>% 
+#   mutate('elig_diabetes' = case_when(elig_diabetes ~ T,
+#                                      !elig_diabetes & !elig_a1c_missing ~ NA,
+#                                      T ~ elig_diabetes)) %>% 
+#   mutate('elig' = elig_age & elig_diabetes & elig_surgery & elig_bmi_range & elig_cvd & elig_cancer & elig_pregnancy) %>% 
+#   mutate('R' = as.numeric(!is.na(elig)))
+# 
+# df_durable <- 
+#   durable_trials %>% 
+#   filter(elig) %>% 
+#   mutate('surgery' = factor(ifelse(surgery == 1, 'Bariatric Surgery', 'No Bariatric Surgery')),
+#          'baseline_insulin' = fct_rev(factor(ifelse(baseline_insulin == 1, 'Yes', 'No'))),
+#          'baseline_diabetes_rx' = fct_rev(factor(ifelse(baseline_diabetes_rx == 1, 'Yes', 'No'))),
+#          'hypertension' = fct_rev(factor(ifelse(hypertension == 1, 'Yes', 'No'))),
+#          'dyslipidemia' = fct_rev(factor(ifelse(dyslipidemia == 1, 'Yes', 'No'))),
+#          'cvd_event_7yr' = case_when(cvd_event == 1 & cvd_time <= 84 ~ 'CVD',
+#                                      cvd_event == 1 & cvd_time > 84 ~ 'No CVD',
+#                                      cvd_event == 0 & cvd_time >= 84 ~ 'No CVD',
+#                                      cvd_event == 0 & cvd_time <= 84 ~ 'Censored'))
+# 
+# 
+# 
+# df_durable$elig_status <- 'No Requirement of Baseline A1c'
+# df_restrict <- 
+#   df_durable %>% 
+#   filter(elig_a1c_missing)
+# df_restrict$elig_status <- 'Requirement of Baseline A1c'
+# df_final <- bind_rows(df_durable, df_restrict)
+# 
+# label(df_final$baseline_age) <- 'Baseline Age'
+# label(df_final$gender) <- 'Sex'
+# label(df_final$race) <- 'Race'
+# label(df_final$baseline_bmi) <- 'Baseline BMI'
+# label(df_final$baseline_a1c) <- 'Baseline HbA1c %'
+# label(df_final$bmi_change_1yr) <- '1-Year Change in BMI'
+# label(df_final$baseline_insulin) <- 'Insulin Usage w/in Past Year'
+# label(df_final$baseline_diabetes_rx) <- 'Any Diabetes Medication Rx w/in Past Year'
+# label(df_final$hypertension) <- 'Hypertension'
+# label(df_final$dyslipidemia) <- 'Dyslipidemia'
+# label(df_final$smoking_status) <- 'Self-Reported Smoking Status'
+# label(df_final$cvd_event_7yr) <- 'CVD Status at 7 Years'
+# label(df_final$baseline_eGFR) <- 'Baseline eGFR'
+# 
+# tbl_1D <-
+#   table1(~baseline_age + gender + race + smoking_status + baseline_bmi + bmi_change_1yr + baseline_a1c + 
+#            baseline_eGFR + baseline_insulin + baseline_diabetes_rx + hypertension + dyslipidemia + 
+#            cvd_event_7yr | elig_status + surgery,
+#          data = df_final, 
+#          render.continuous = render.continuous,
+#          render.strat = render.strat.subj_trials_durable,
+#          render.categorical = render.categorical,
+#          overall = F)
+# tbl_1D
+# write_lines(tbl_1D, 'figures/tables/population_summary_table_DURABLE.html')

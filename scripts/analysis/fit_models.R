@@ -21,9 +21,10 @@ trial_range <- 1:84
 
 df_trials <- read_parquet(glue('{data_dir}/bariatric_tte/all_trials_combined.parquet'))
 
-criteria <- c('elig_age', 'elig_diabetes', 'elig_surgery', 'elig_bmi_missing', 'elig_bmi_range', 'elig_cvd')
+### Various eligibility criteria
+criteria <- c('elig_age', 'elig_diabetes', 'elig_surgery', 'elig_bmi_missing', 'elig_bmi_range', 'elig_cvd', 'elig_pregnancy', 'elig_cancer')
 pre_op <- c('elig_smoking', 'elig_bmi_change')
-exclusions <- c('elig_exclusions', 'elig_pregnancy')
+exclusions <- c('elig_exclusions')
 
 formulae <- 
   list('Linear Main Effects' = 
@@ -37,30 +38,19 @@ formulae <-
          bmi_change_1yr + a1c_change_1yr + trial_id,
        
        
-       'Madenci Proxy (NCS on Continuous Covariates, No Smoking or 1-Year A1c Change)' = 
+       'Madenci Proxy' = 
          surgery ~ 
          ### Categorical
          race_black + gender + past_1yr_insulin + 
-         hypertension + dyslipidemia + 
+         hypertension + dyslipidemia + smoking_status + 
          
          ### Continuous
          ns(trial_id, knots = quantile(trial_id, 0.5), Boundary.knots = quantile(trial_id, c(0.1, 0.9))) + 
          ns(baseline_age, knots = quantile(baseline_age, 0.5), Boundary.knots = quantile(baseline_age, c(0.1, 0.9))) +
          ns(baseline_bmi, knots = quantile(baseline_bmi, 0.5), Boundary.knots = quantile(baseline_bmi, c(0.1, 0.9))) + 
          ns(baseline_a1c, knots = quantile(baseline_a1c, 0.5), Boundary.knots = quantile(baseline_a1c, c(0.1, 0.9))) +
-         ns(bmi_change_1yr, knots = quantile(bmi_change_1yr, 0.5), Boundary.knots = quantile(bmi_change_1yr, c(0.1, 0.9))),
-      
-       'Best BIC Model (Splines on BMI/Age, No A1c 1yr Change)' = 
-         surgery ~ 
-         ### Categorical
-         race_black + gender + smoking_status + 
-         hypertension + dyslipidemia + past_1yr_insulin +
-         
-         ### Continuous
-         baseline_a1c + trial_id + bmi_change_1yr +
-         
-         ns(baseline_bmi, knots = quantile(baseline_bmi, 0.5), Boundary.knots = quantile(baseline_bmi, c(0.1, 0.9))) +
-         ns(baseline_age, knots = 33)
+         ns(bmi_change_1yr, knots = quantile(bmi_change_1yr, 0.5), Boundary.knots = quantile(bmi_change_1yr, c(0.1, 0.9))) +
+         ns(a1c_change_1yr, knots = quantile(a1c_change_1yr, 0.5), Boundary.knots = quantile(a1c_change_1yr, c(0.1, 0.9)))
   )
 
 ### Loop Over Various Elig Criteria to run analysis

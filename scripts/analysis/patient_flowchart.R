@@ -27,7 +27,7 @@ df0 <-
 ### Elig 1
 df1 <- 
   df_trials %>% 
-  filter(elig_age, elig_a1c_missing, elig_diabetes, elig_surgery, elig_bmi_missing, elig_bmi_range, elig_cvd) %>% 
+  filter(elig_age, elig_a1c_missing, elig_diabetes, elig_surgery, elig_bmi_missing, elig_bmi_range, elig_cvd, elig_cancer, elig_pregnancy) %>% 
   group_by(surgery) %>% 
   summarise('n_subjects' = n_distinct(subject_id),
             'n_trials' = n())
@@ -35,7 +35,7 @@ df1 <-
 ### Elig 2
 df2 <- 
   df_trials %>% 
-  filter(elig_age, elig_a1c_missing, elig_diabetes, elig_surgery, elig_bmi_missing, elig_bmi_range, elig_cvd) %>% 
+  filter(elig_age, elig_a1c_missing, elig_diabetes, elig_surgery, elig_bmi_missing, elig_bmi_range, elig_cvd, elig_cancer, elig_pregnancy) %>% 
   filter(elig_smoking, elig_bmi_change) %>% 
   group_by(surgery) %>% 
   summarise('n_subjects' = n_distinct(subject_id),
@@ -44,9 +44,9 @@ df2 <-
 ### Elig 3
 df3 <- 
   df_trials %>% 
-  filter(elig_age, elig_a1c_missing, elig_diabetes, elig_surgery, elig_bmi_missing, elig_bmi_range, elig_cvd) %>% 
+  filter(elig_age, elig_a1c_missing, elig_diabetes, elig_surgery, elig_bmi_missing, elig_bmi_range, elig_cvd, elig_cancer, elig_pregnancy) %>% 
   filter(elig_smoking, elig_bmi_change) %>% 
-  filter(elig_exclusions, elig_pregnancy) %>% 
+  filter(elig_exclusions) %>% 
   group_by(surgery) %>% 
   summarise('n_subjects' = n_distinct(subject_id),
             'n_trials' = n())
