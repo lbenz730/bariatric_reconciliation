@@ -2,8 +2,8 @@
 
 #SBATCH -c 2 ## number of cores
 #SBATCH -t 0-1:00 ## amount of time in D-HH:MM
-#SBATCH -p fasse_bigmem ## Partition to submit to
-#SBATCH --mem=190000 ## memory pool for all cores
+#SBATCH -p serial_requeue ## Partition to submit to
+#SBATCH --mem=180000 ## memory pool for all cores
 #SBATCH -o logs/bootstrap/log.stdout_%a ## STDOUT
 #SBATCH -e logs/bootstrap/log.stderr_%a ## STDERR
 #SBATCH --account=haneuse_lab

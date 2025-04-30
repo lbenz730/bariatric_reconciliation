@@ -52,8 +52,8 @@ df_summary <-
   df_bootstraps %>% 
   group_by(ipw_formula, elig_criteria, outcome_model, outcome_formula, surgery, time) %>% 
   summarise('mean_ci' = mean(cum_incidence),
-            'lower_ci' = mean(cum_incidence) + qnorm(0.025) * sd(cum_incidence),
-            'upper_ci' = mean(cum_incidence) + qnorm(0.975) * sd(cum_incidence)) %>% 
+            'lower_ci' = 2 * mean(cum_incidence) - quantile(cum_incidence, 0.975),
+            'upper_ci' = 2 * mean(cum_incidence) - quantile(cum_incidence, 0.025)) %>% 
   ungroup() 
 
 
@@ -85,10 +85,10 @@ df_table <-
   summarise('risk_ratio' = cum_incidence[surgery == 1]/cum_incidence[surgery == 0],
             'risk_difference' = cum_incidence[surgery == 1] - cum_incidence[surgery == 0]) %>% 
   group_by(ipw_formula, elig_criteria, time, outcome_model, outcome_formula) %>% 
-  summarise('lower_rr' = mean(risk_ratio) + qnorm(0.025) * sd(risk_ratio),
-            'upper_rr' = mean(risk_ratio) + qnorm(0.975) * sd(risk_ratio),
-            'lower_rd' = mean(risk_difference) + qnorm(0.025) * sd(risk_difference),
-            'upper_rd' = mean(risk_difference) + qnorm(0.975) * sd(risk_difference)) %>% 
+  summarise('lower_rr' = 2 * mean(risk_ratio, na.rm = T) - quantile(risk_ratio, 0.975, na.rm = T),
+            'upper_rr' = 2 * mean(risk_ratio, na.rm = T) - quantile(risk_ratio, 0.025, na.rm = T),
+            'lower_rd' = 2 * mean(risk_difference, na.rm = T) - quantile(risk_difference, 0.975, na.rm = T),
+            'upper_rd' = 2 * mean(risk_difference, na.rm = T) - quantile(risk_difference, 0.025, na.rm = T)) %>% 
   ungroup() %>% 
   inner_join(
     df_ci %>% 
