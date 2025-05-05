@@ -20,6 +20,7 @@ n_trials <- 96
 # df_trials <- map_dfr(1:n_trials, ~read_parquet(glue('{data_dir}/bariatric_tte/trial_{.x}_tte1.parquet')))
 # write_parquet(df_trials, glue('{data_dir}/bariatric_tte/all_trials_combined.parquet'))
 df_trials <- read_parquet(glue('{data_dir}/bariatric_tte/all_trials_combined.parquet'))
+df_surgery <- read_parquet(glue('{data_dir}/bs_types_reviewed.parquet')) ### bs types
 
 trial_range <- 1:84
 
@@ -54,6 +55,8 @@ df1 <-
   df1_naive %>% 
   bind_rows(df1_preop) %>% 
   bind_rows(df1_extra) %>% 
+  left_join(df_surgery %>% select(subject_id, bs_type)) %>% 
+  mutate('bs_type' = ifelse(surgery == 0, 'CONTROL', bs_type)) %>% 
   filter(!is.na(baseline_a1c)) %>% 
   mutate('surgery' = factor(ifelse(surgery == 1, 'Bariatric Surgery', 'No Bariatric Surgery')),
          'race_black' = factor(ifelse(race_black == 1, 'African-American', 'Non African-American')),
@@ -86,7 +89,7 @@ label(df1$cvd_event_7yr) <- 'CVD Status at 7 Years'
 tbl_1 <- 
   table1(~baseline_age + gender + race_black + smoking_status + baseline_bmi + bmi_change_1yr +  baseline_a1c + a1c_change_1yr +
            past_1yr_insulin + past_1yr_diabetes_rx + hypertension + osteoarthritis + dyslipidemia + 
-           obstructive_sleep_apnea + cvd_event_7yr | elig + surgery,
+           obstructive_sleep_apnea + cvd_event_7yr + bs_type | elig + surgery,
          data = df1, 
          render.continuous = render.continuous,
          render.strat = render.strat.subj_trials,
