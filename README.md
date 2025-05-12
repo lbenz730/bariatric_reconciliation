@@ -2,7 +2,7 @@
 
 Code for the paper:
 
-Haneuse, S., Benz, L., Smith, V., Arterburn, D., and Macejewski, M.L. "Long-term cardiovascular outcomes following bariatric surgery: Reconciling seemingly conflicting evidence." 
+Haneuse, S., Benz, L., Smith, V., Arterburn, D., and Macejewski, M.L. "Long-term cardiovascular outcomes following bariatric surgery: Reconciling seemingly conflicting evidence." _Under Review_, 2025.
 
 ## R Scripts (`scripts/`)
 
