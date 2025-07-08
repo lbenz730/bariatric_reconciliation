@@ -22,10 +22,11 @@ __helpers.R__: Useful helper functions
 * __bootstrap_CI.R__: Bootstrap confidence intervals for cumulative incidence curves (Figure 1, Table 2)
 * __plot_CI.R__: Plot cumulative incidence curves
 * __population_summary.R__: Script to make summary tables of the population (Table 1)
-* __spline_BIC.R__: Analysis of BIC for various IPW models using NCS on various continuous covariates
+* __spline_BIC.R__: Analysis of BIC for various IPW models using NCS on various continuous covariates (eFigure 4)
 * __patient_flowchart.R__: Numbers for patient flow chart (eFigure 1)
 * __covariate_balance.R__: Use `cobalt` to make covariate balance plot (eFigure 2)
 * __bmi_a1c_change_eda.R__: Create Figure 2
+* __weight_summary.R__: Summary of inverse probability weights (eFigure 3 and eTable 2)
 
 ## Jobs (`jobs/`)
 * __build_cvd_trials.sh__: Build target trials in sequence
