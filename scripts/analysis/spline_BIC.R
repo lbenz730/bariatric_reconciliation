@@ -67,7 +67,7 @@ ggplot(df_continuous, aes(x = bucket, y = pct_surgery)) +
        subtitle = 'Trial #1A',
        x = 'Covariate Value',
        y = '% of Person-Trials\nUndergoing Bariatric Surgery',
-       fill = '# of Person-Trials')
+       fill = '# of Patient-Trials')
 ggsave('figures/results/continuous_covariates.png', height = 9/1.2, width = 16/1.2)
 
 ggplot(df_continuous %>% filter(n_obs >= 10000), aes(x = bucket, y = pct_surgery)) + 
@@ -83,7 +83,7 @@ ggplot(df_continuous %>% filter(n_obs >= 10000), aes(x = bucket, y = pct_surgery
        subtitle = 'No Pre-Operative Restrictions\nBuckets w/ >= 10,000 Observations',
        x = 'Covariate Value',
        y = '% of Person-Trials\nUndergoing Bariatric Surgery',
-       fill = '# of Person-Trials')
+       fill = '# of Patient-Trials')
 ggsave('figures/results/continuous_covariates_filtered.png', height = 9/1.2, width = 16/1.2)
 
 
